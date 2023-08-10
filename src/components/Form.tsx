@@ -1,12 +1,4 @@
-import {
-  FC,
-  FormEvent,
-  SetStateAction,
-  ComponentState,
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import { FC, FormEvent, SetStateAction, ComponentState, useState } from "react";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import { ReactComponent as Chevron } from "../assets/chevron-down-solid.svg";
 import { Labels } from "../App";
@@ -16,11 +8,13 @@ interface Props {
   state: ComponentState;
   setter: SetStateAction<any>;
   labels: Labels[];
+  index: number;
+  add: () => any;
 }
 
-const Form: FC<Props> = ({ legend, state, setter, labels }) => {
+const Form: FC<Props> = ({ legend, state, setter, labels, index, add }) => {
   const [open, setOpen] = useState(false);
-  const [animated] = useAutoAnimate({ duration: 300 });
+  const [animated] = useAutoAnimate({ duration: 500 });
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -28,13 +22,27 @@ const Form: FC<Props> = ({ legend, state, setter, labels }) => {
     const data = Array.from(
       event.currentTarget.getElementsByTagName("input")
     ).map((element) => element.type !== "submit" && element.value);
-    const formData = { ...state };
+    const formData = { ...state[index] };
 
     for (let i = 0; i < data.length; i++) {
-      data[i] && (formData[Object.keys(state)[i]] = data[i]);
+      data[i] && (formData[Object.keys(state[index])[i]] = data[i]);
     }
 
-    setter(formData);
+    const newState = [...state];
+
+    newState.splice(index, 1, formData);
+
+    setter(newState);
+  };
+
+  const addForm = () => {
+    setter([...state, add()]);
+  };
+
+  const deleteForm = () => {
+    const newState = [...state];
+    newState.splice(index, 1);
+    setter(newState);
   };
 
   return (
@@ -45,7 +53,7 @@ const Form: FC<Props> = ({ legend, state, setter, labels }) => {
       <button
         aria-label="chevron"
         type="button"
-        className={`absolute right-10 transition-rotate duration-300 rounded-full ${
+        className={`absolute right-10 transition-rotate duration-500 rounded-full ${
           open ? "transform rotate-180" : ""
         }`}
         onClick={() => setOpen((prev) => !prev)}
@@ -69,19 +77,33 @@ const Form: FC<Props> = ({ legend, state, setter, labels }) => {
                   type="text"
                   name={label}
                   placeholder={userReadableLabel}
-                  defaultValue={Object.values(state)[i] as string}
+                  defaultValue={Object.values(state[index])[i] as string}
                   className="ms-2 px-2 bg-slate-200 rounded-full"
                 />
               </fieldset>
             );
           })}
-        {open && (
-          <input
-            type="submit"
-            value="save"
-            className="border bg-cyan-300 rounded-full px-4 m-2"
-          />
-        )}
+        <div className="flex justify-between">
+          {open && (
+            <input
+              type="submit"
+              value="save"
+              className="border bg-cyan-300 rounded-full px-4 m-2"
+            />
+          )}
+          {open && legend !== "Contact information" && (
+            <>
+              <button type="button" onClick={addForm}>
+                add
+              </button>
+              {state.length > 1 && (
+                <button type="button" onClick={deleteForm}>
+                  remove
+                </button>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </form>
   );
