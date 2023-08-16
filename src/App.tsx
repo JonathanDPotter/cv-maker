@@ -1,20 +1,22 @@
-import { v4 as uuid } from "uuid";
-import Form from "./components/Form";
 import { useState } from "react";
+import { v4 as uuid } from "uuid";
+import { useAutoAnimate } from "@formkit/auto-animate/react";
+import Form from "./components/Form";
+import PDFdocument from "./components/PDFdocument";
 
 export interface Labels {
   key: string;
   label: string;
 }
 
-interface Contact {
+export interface Contact {
   fullName: string;
   email: string;
   phoneNumber: string;
   address: string;
 }
 
-interface Education {
+export interface Education {
   school: string;
   degree: string;
   startDate: string;
@@ -22,7 +24,7 @@ interface Education {
   location: string;
 }
 
-interface Experience {
+export interface Experience {
   companyName: string;
   positionTitle: string;
   startDate: string;
@@ -32,6 +34,8 @@ interface Experience {
 }
 
 const App = () => {
+  const [animated] = useAutoAnimate({ duration: 500 });
+
   const contact = (): Contact => {
     return { fullName: "", email: "", phoneNumber: "", address: "" };
   };
@@ -100,17 +104,19 @@ const App = () => {
   ];
 
   return (
-    <div className="flex">
-      <section className="w-[50%] m-2 flex flex-col gap-2">
+    <div className="flex min-h-[100vh]">
+      <section
+        className="w-[50%] m-2 flex flex-col gap-2 min-h-full"
+        ref={animated}
+      >
         {forms && forms.map((formData) => <Form {...formData} />)}
       </section>
-      <section className="w-[50]">
-        {contactState &&
-          Object.keys(contactState[0]).map((key, i) => (
-            <p key={key}>
-              {key}: {Object.values(contactState[0])[i]}{" "}
-            </p>
-          ))}
+      <section className="w-[50] min-h-full">
+        <PDFdocument
+          {...{ contactState }}
+          {...{ educationState }}
+          {...{ experienceState }}
+        />
       </section>
     </div>
   );
