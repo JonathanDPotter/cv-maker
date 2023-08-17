@@ -3,6 +3,8 @@ import { v4 as uuid } from "uuid";
 import { useAutoAnimate } from "@formkit/auto-animate/react";
 import Form from "./components/Form";
 import PDFdocument from "./components/PDFdocument";
+import MobileCV from "./components/MobileCV";
+import detectMobile from "./utils/detectMobile";
 
 export interface Labels {
   key: string;
@@ -35,6 +37,9 @@ export interface Experience {
 
 const App = () => {
   const [animated] = useAutoAnimate({ duration: 500 });
+  const [isMobile] = useState(detectMobile(navigator.userAgent));
+
+  console.log(navigator.userAgent);
 
   const contact = (): Contact => {
     return { fullName: "", email: "", phoneNumber: "", address: "" };
@@ -104,19 +109,24 @@ const App = () => {
   ];
 
   return (
-    <div className="flex min-h-[100vh]">
-      <section
-        className="w-[50%] m-2 flex flex-col gap-2 min-h-full"
-        ref={animated}
-      >
+    <div className={`flex ${isMobile ? "flex-col" : ""} min-h-[100vh]`}>
+      <section className="p-2 flex flex-col gap-2 min-w-[30vw]" ref={animated}>
         {forms && forms.map((formData) => <Form {...formData} />)}
       </section>
-      <section className="w-[50] min-h-full">
-        <PDFdocument
-          {...{ contactState }}
-          {...{ educationState }}
-          {...{ experienceState }}
-        />
+      <section className="flex-1">
+        {isMobile ? (
+          <MobileCV
+            {...{ contactState }}
+            {...{ educationState }}
+            {...{ experienceState }}
+          />
+        ) : (
+          <PDFdocument
+            {...{ contactState }}
+            {...{ educationState }}
+            {...{ experienceState }}
+          />
+        )}
       </section>
     </div>
   );

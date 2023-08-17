@@ -24,6 +24,12 @@ const Form: FC<Props> = ({ legend, state, setter, labels, index, add }) => {
     const data = Array.from(
       event.currentTarget.getElementsByTagName("input")
     ).map((element) => element.type !== "submit" && element.value);
+
+    const textAreaData = Array.from(
+      event.currentTarget.getElementsByTagName("textarea")
+    )[0]?.value;
+
+    textAreaData && data.splice(5, 0, textAreaData);
     const formData = { ...state[index] };
 
     for (let i = 0; i < data.length; i++) {
@@ -50,7 +56,7 @@ const Form: FC<Props> = ({ legend, state, setter, labels, index, add }) => {
   return (
     <form
       onSubmit={onSubmit}
-      className={`border border-black ${
+      className={`border border-black w-[100%] max-w-lg mx-auto ${
         open ? "rounded-lg" : "rounded-t-lg"
       } relative`}
     >
@@ -102,17 +108,28 @@ const Form: FC<Props> = ({ legend, state, setter, labels, index, add }) => {
               .split(/(?=[A-Z])/)
               .map((string) => string[0].toLocaleUpperCase() + string.slice(1))
               .join(" ");
+            const defaultValue = Object.values(state[index])[i] as string;
+            const classes = "ms-2 px-2 w-[50%] max-w-md bg-slate-200 rounded";
 
             return (
               <fieldset key={key} className="my-2 flex justify-between">
                 <label htmlFor="label">{userReadableLabel}</label>
-                <input
-                  type="text"
-                  name={label}
-                  placeholder={userReadableLabel}
-                  defaultValue={Object.values(state[index])[i] as string}
-                  className="ms-2 px-2 bg-slate-200 rounded-full"
-                />
+                {label === "description" ? (
+                  <textarea
+                    name={label}
+                    placeholder={userReadableLabel}
+                    defaultValue={defaultValue}
+                    className={classes}
+                  ></textarea>
+                ) : (
+                  <input
+                    type="text"
+                    name={label}
+                    placeholder={userReadableLabel}
+                    defaultValue={Object.values(state[index])[i] as string}
+                    className={classes}
+                  />
+                )}
               </fieldset>
             );
           })}

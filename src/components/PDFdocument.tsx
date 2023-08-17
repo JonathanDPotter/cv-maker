@@ -1,24 +1,6 @@
-import {
-  Document,
-  Page,
-  Text,
-  View,
-  StyleSheet,
-  PDFViewer,
-} from "@react-pdf/renderer";
+import { Document, Page, Text, View, PDFViewer } from "@react-pdf/renderer";
 import { Contact, Education, Experience } from "../App";
 import { FC } from "react";
-// Create styles
-const styles = StyleSheet.create({
-  section: {
-    margin: 10,
-    padding: 10,
-  },
-  viewer: {
-    width: window.innerWidth, //the pdf viewer will take up all of the width and height
-    height: window.innerHeight,
-  },
-});
 
 interface Props {
   contactState: Contact[];
@@ -32,7 +14,7 @@ const PDFdocument: FC<Props> = ({
   experienceState,
 }) => {
   return (
-    <PDFViewer style={styles.viewer}>
+    <PDFViewer style={{ width: "100%", height: "100vh" }}>
       <Document>
         <Page
           size="LETTER"
@@ -89,6 +71,7 @@ const PDFdocument: FC<Props> = ({
             <View
               style={{
                 display: `${educationState[0].school ? "flex" : "none"}`,
+                gap: 10,
               }}
             >
               <Text
@@ -140,6 +123,7 @@ const PDFdocument: FC<Props> = ({
             <View
               style={{
                 display: `${experienceState[0].companyName ? "flex" : "none"}`,
+                gap: 10,
               }}
             >
               <View>
